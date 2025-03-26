@@ -7,36 +7,36 @@ function Dashboard() {
   return (
     <>
       <div>
-        <div className="w-[33%] h-[100vh] border-2 border-black ml-[-122px] bg-black text-center pt-25">
+        <div className="w-[27%] h-[100vh] border-2 border-black ml-[-122px] bg-black text-center pt-25">
           <h2 className="text-amber-50 text-7xl font-bold mb-10">Logo</h2>
           <div className="flex flex-col gap-20 mt-20 items-center">
             {" "}
             <Link
               to={"/dashboard"}
-              className="text-amber-50 text-4xl font-bold flex items-center gap-4"
+              className="text-amber-50 text-3xl font-bold flex items-center gap-4"
             >
-              <img src={home} alt="" className="w-[60px] h-14" />
+              <img src={home} alt="" className="w-[50px] h-14" />
               Home
             </Link>
             <Link
               to={"/profile"}
-              className="text-amber-50 text-4xl font-bold flex items-center gap-4"
+              className="text-amber-50 text-3xl font-bold flex items-center gap-4"
             >
-              <img src={profile} alt="" className="w-[60px] h-14" />
+              <img src={profile} alt="" className="w-[50px] h-14" />
               Profile
             </Link>
             <Link
               to={"/post"}
-              className="text-amber-50 text-4xl font-bold flex items-center gap-4 ml-[-30px]"
+              className="text-amber-50 text-3xl font-bold flex items-center gap-4 ml-[-30px]"
             >
-              <img src={plus} alt="" className="w-[60px] h-14" />
+              <img src={plus} alt="" className="w-[50px] h-14" />
               Post
             </Link>
             <Link
               to={"/search"}
-              className="text-amber-50 text-4xl font-bold flex items-center gap-4 ml-2"
+              className="text-amber-50 text-3xl font-bold flex items-center gap-4 ml-2"
             >
-              <img src={search} alt="" className="w-[60px] h-14" />
+              <img src={search} alt="" className="w-[50px] h-14" />
               Search
             </Link>
           </div>

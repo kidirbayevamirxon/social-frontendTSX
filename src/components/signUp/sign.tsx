@@ -10,11 +10,10 @@ type MyResponseType = {
   success?: boolean;
   message?: string;
   status?: number;
-  data?: {
-    access_token?: string;
-    refresh_token?: string;
-  };
+  access_token?: string; // ✅ To‘g‘ridan-to‘g‘ri `result` ichida keladi
+  refresh_token?: string;
 };
+
 
 function Sign() {
   const [first_name, setFirstName] = useState("");
@@ -22,10 +21,11 @@ function Sign() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUserName] = useState("");
-  const {loading, error, postData } = usePostRequest<MyResponseType>(
+  const { loading, error, postData } = usePostRequest<MyResponseType>(
     "https://social-backend-kzy5.onrender.com/auth/sign-up"
   );
   const navigate = useNavigate();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -38,87 +38,90 @@ function Sign() {
           password,
           username,
         },
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
+
+      console.log("🔍 Backend natijasi:", result);
 
       if (
         result &&
         (result.message === "user successfully created" ||
           result.status === 201)
       ) {
-        navigate("/");
-      } else {
-        console.error("Ro‘yxatdan o‘tishda xatolik:", result);
-      }
+        if (result.access_token) {
+          localStorage.setItem("accessToken", result.access_token);
+          localStorage.setItem("refreshToken", result.refresh_token || "");
+        } 
+        navigate("/dashboard");
+      } 
     } catch (error) {
-      console.error("Serverga so‘rov yuborishda xatolik:", error);
+      console.error("❌ Serverga so‘rov yuborishda xatolik:", error);
     }
   };
 
   return (
-    <>
-      <div className="p-0">
-        <div className="w-1/4 h-1/2 border border-black my-24 mx-auto rounded-[20px] p-0">
-          <div className="flex justify-center">
-            <h2 className="text-5xl mt-6">Login</h2>
-          </div>
-          <form className="flex flex-col p-8 gap-4">
-            <Label htmlFor="first-name">First-Name</Label>
-            <Input
-              placeholder="First-Name"
-              id="first-name"
-              value={first_name}
-              onChange={(e) => setFirstName(e.target.value)}
-              required
-            ></Input>
-
-            <Label htmlFor="last-name">Last-Name</Label>
-            <Input
-              placeholder="Last-Name"
-              id="last-name"
-              value={last_name}
-              onChange={(e) => setLastName(e.target.value)}
-              required
-            ></Input>
-
-            <Label htmlFor="username">username</Label>
-            <Input
-              placeholder="Username"
-              id="username"
-              value={username}
-              onChange={(e) => setUserName(e.target.value)}
-              required
-            ></Input>
-
-            <Label htmlFor="email">Email</Label>
-            <Input
-              placeholder="Email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            ></Input>
-
-            <Label htmlFor="password">Password</Label>
-            <Input
-              placeholder="Password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            ></Input>
-
-            <Button onClick={handleSubmit}>
-              {loading ? (
-                <LoaderCircle className="animate-spin w-8 h-8" />
-              ) : (
-                "Submit"
-              )}
-            </Button>
-            {error && <p className="text-red-500">Xatolik: {error}</p>}
-          </form>
+    <div className="p-0">
+      <div className="w-1/4 h-1/2 border border-black my-24 mx-auto rounded-[20px] p-0">
+        <div className="flex justify-center">
+          <h2 className="text-5xl mt-6">SIGN UP</h2>
         </div>
+        <form className="flex flex-col p-8 gap-4" onSubmit={handleSubmit}>
+          <Label htmlFor="first-name">First-Name</Label>
+          <Input
+            placeholder="First-Name"
+            id="first-name"
+            value={first_name}
+            onChange={(e) => setFirstName(e.target.value)}
+            required
+          />
+
+          <Label htmlFor="last-name">Last-Name</Label>
+          <Input
+            placeholder="Last-Name"
+            id="last-name"
+            value={last_name}
+            onChange={(e) => setLastName(e.target.value)}
+            required
+          />
+
+          <Label htmlFor="username">Username</Label>
+          <Input
+            placeholder="Username"
+            id="username"
+            value={username}
+            onChange={(e) => setUserName(e.target.value)}
+            required
+          />
+          <Label htmlFor="email">Email</Label>
+          <Input
+            placeholder="Email"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <Label htmlFor="password">Password</Label>
+          <Input
+            type="password"
+            placeholder="Password"
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <Button type="submit">
+            {loading ? (
+              <LoaderCircle className="animate-spin w-8 h-8" />
+            ) : (
+              "Submit"
+            )}
+          </Button>
+          {error && <p className="text-red-500">Xatolik: {error}</p>}
+        </form>
       </div>
-    </>
+    </div>
   );
 }
 
