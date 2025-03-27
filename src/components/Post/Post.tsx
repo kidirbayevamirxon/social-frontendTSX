@@ -3,7 +3,7 @@ import leftStrelka from "/arrow-left-solid.svg";
 import { useNavigate } from "react-router-dom";
 import { Input } from "../ui/input";
 import { Label } from "@radix-ui/react-label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { LoaderCircle } from "lucide-react";
 import { usePostRequest } from "../Request/UsePostRequest";
@@ -44,7 +44,7 @@ function Post() {
       console.error("Fayl tanlanmagan!");
       return;
     }
-
+    setMessage(null);
     setLoading(true);
 
     const formData = new FormData();
@@ -59,7 +59,6 @@ function Post() {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-
       if (response.data.img_id) {
         const newImgId = response.data.img_id;
         setImg_Id(newImgId);
@@ -70,9 +69,16 @@ function Post() {
             image_id: newImgId,
           },
         } as PostRequestOptions);
+        setMessage("Post muvaffaqiyatli yuklandi! ✅");
+        navigate("/dashboard");
+      }
+      if (response.data) {
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1500);
       }
     } catch (error) {
-      console.error("Yuborishda xatolik:", error);
+      setMessage("Xatolik yuz berdi, iltimos qayta urinib ko‘ring ❌");
     } finally {
       setLoading(false);
     }
@@ -124,8 +130,8 @@ function Post() {
               "Submit"
             )}
           </Button>
-
-          {/* {error && <p className="text-red-500">Xatolik: {error}</p>} */}
+          {message && <p className="text-white text-2xl mt-4">{message}</p>}
+          {error && <p className="text-red-500">Xatolik: {error}</p>}
         </div>
       </div>
     </div>
