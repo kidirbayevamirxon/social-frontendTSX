@@ -4,17 +4,30 @@ import { useNavigate } from "react-router-dom";
 import { Input } from "../ui/input";
 import { Label } from "@radix-ui/react-label";
 import { useState } from "react";
+import axios from "axios";
+import { LoaderCircle } from "lucide-react";
 import { usePostRequest } from "../Request/UsePostRequest";
+
+interface PostRequestOptions {
+  body: {
+    text: string;
+    image_id: number;
+  };
+}
 
 function Post() {
   const navigate = useNavigate();
-  const { data, loading, error, postData } = usePostRequest(
-    "https://social-backend-kzy5.onrender.com/image/"
-  );
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [caption, setCaption] = useState<string>("");
-
+  const [message, setMessage] = useState<string | null>(null);
+  const [img_Id, setImg_Id] = useState<number>();
+  const {
+    data,
+    loading: loader,
+    error,
+    postData,
+  } = usePostRequest("https://social-backend-kzy5.onrender.com/posts/upload");
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setSelectedFile(file);
@@ -23,25 +36,47 @@ function Post() {
     }
   };
 
+  const [loading, setLoading] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedFile) {
       console.error("Fayl tanlanmagan!");
       return;
     }
-  
+
+    setLoading(true);
+
     const formData = new FormData();
     formData.append("file", selectedFile);
-    
+    formData.append("caption", caption);
+
     try {
-      await postData({
-        body: formData,
-      });
+      const response = await axios.post(
+        "https://social-backend-kzy5.onrender.com/image/",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
+      if (response.data.img_id) {
+        const newImgId = response.data.img_id;
+        setImg_Id(newImgId);
+
+        postData({
+          body: {
+            text: caption,
+            image_id: newImgId,
+          },
+        } as PostRequestOptions);
+      }
     } catch (error) {
       console.error("Yuborishda xatolik:", error);
+    } finally {
+      setLoading(false);
     }
   };
-  
 
   return (
     <div className="bg-black w-full h-screen overflow-hidden">
@@ -83,10 +118,14 @@ function Post() {
             onClick={handleSubmit}
             disabled={loading}
           >
-            {loading ? "Uploading..." : "Submit"}
+            {loading ? (
+              <LoaderCircle className="animate-spin w-16 h-16" />
+            ) : (
+              "Submit"
+            )}
           </Button>
 
-          {error && <p className="text-red-500">Xatolik: {error}</p>}
+          {/* {error && <p className="text-red-500">Xatolik: {error}</p>} */}
         </div>
       </div>
     </div>

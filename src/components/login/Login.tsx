@@ -29,6 +29,7 @@ function Login() {
         password,
       },
     });
+    localStorage.setItem("username", username);
   };
   useEffect(() => {
     if (data?.message === "login success" && data.access_token) {

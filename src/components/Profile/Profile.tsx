@@ -42,7 +42,8 @@ function Profile() {
     const formData = new FormData();
     formData.append("file", user_image);
 
-    let token = localStorage.getItem("accessToken");
+    let token = localStorage.getItem("access_token");
+
     if (!token) {
       setError("⚠️ Avtorizatsiya tokeni topilmadi!");
       return;
@@ -51,7 +52,7 @@ function Profile() {
     setLoading(true);
 
     try {
-      await axios.post(
+      const response = await axios.post(
         "https://social-backend-kzy5.onrender.com/image/user",
         formData,
         {
@@ -61,44 +62,56 @@ function Profile() {
           },
         }
       );
+
+      if (response.status === 200) {
+        setUserImage(preview);
+        setError(null);
+      }
     } catch (err) {
       console.error("❌ Rasm yuklashda xatolik:", err);
+      setError("❌ Rasm yuklashda muammo yuz berdi.");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem("access_token");
     const storedUsername = localStorage.getItem("username");
-  
-    if (!token || !storedUsername) {
-      console.error("⚠️ Token yoki username topilmadi!");
-      navigate("/"); 
+    console.log(storedUsername);
+
+    if (!token) {
+      console.error("⚠️ Token topilmadi!");
+      navigate("/");
       return;
     }
-  
+
     axios
       .get("https://social-backend-kzy5.onrender.com/auth/user", {
         headers: { Authorization: `Bearer ${token}` },
-        params: { username: storedUsername }, 
+        params: { username: storedUsername },
       })
       .then((res) => {
         console.log("✅ User data:", res.data);
-        setUser_image(res.data?.user_img || null);
-        setFirstName(res.data?.first_name || "No name");
-        setLastName(res.data?.last_name || "No surname");
-        setUserName(res.data?.username || "No username");
-        setFollowers(res.data?.followers || 0);
-        setFollowings(res.data?.followings || 0);
-        setHas_Followed(res.data?.has_followed || false);
-        setEmail(res.data?.email || "No email");
+        const userData =
+          Array.isArray(res.data) && res.data.length > 0 ? res.data[0] : null;
+
+        if (userData) {
+          setUser_image(userData.user_img || null);
+          setFirstName(userData.first_name || "No name");
+          setLastName(userData.last_name || "No surname");
+          setUserName(userData.username || "No username");
+          setFollowers(userData.followers || 0);
+          setFollowings(userData.followings || 0);
+          setEmail(userData.email || "No email");
+        } else {
+          console.error("❌ Foydalanuvchi ma'lumotlari topilmadi!");
+        }
       })
       .catch((error) => {
         console.error("❌ Xatolik:", error.response?.data || error.message);
       });
   }, []);
-  
 
   return (
     <div className="bg-black w-full h-screen overflow-hidden">
@@ -139,25 +152,27 @@ function Profile() {
           </div>
         </div>
         <div className="w-[80%] h-auto bg-neutral-200 mt-20 rounded-3xl p-4">
-          <div className="w-[100%] h-auto rounded-3xl p-16 bg-white shadow-md shadow-orange-50 flex">
+          <div className="w-[100%] h-auto rounded-3xl p-8 bg-white shadow-md shadow-orange-50 flex justify-around items-center">
             <div>
-              <div className="flex gap-4">
+              <div className="flex gap-8 items-center mt-4">
                 <img
-                  className="w-[50px] h-[50px] rounded-4xl"
+                  className="w-[60px] h-[60px] rounded-4xl"
                   src={preview || userImage || user}
                   alt="User Avatar"
                 />
-                <p>{username}</p>
+                <div>
+                  <p className="text-3xl">{username}</p>
+                  <p className="mt-2">{email}</p>
+                </div>
               </div>
-              <p>{email}</p>
+            </div>
+            <div className="flex gap-8 w-xl pl-32">
+              <p className="text-2xl">{first_name}</p>
+              <p className="text-2xl">{last_name}</p>
             </div>
             <div className="flex gap-4">
-              <p>{first_name}</p>
-              <p>{last_name}</p>
-            </div>
-            <div className="flex gap-4">
-              <p>{followers}</p>
-              <p>{followings}</p>
+              <p className="flex gap-4">Follow {followers}</p>
+              <p className="flex gap-4">Followed {followings}</p>
             </div>
           </div>
         </div>
