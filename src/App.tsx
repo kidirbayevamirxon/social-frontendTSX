@@ -5,6 +5,7 @@ import Dashboard from "./components/dashboard/Dashboard.tsx";
 import ResetPass from "./components/resetPass/ResetPass.tsx";
 import Profile from "./components/Profile/Profile.tsx";
 import Post from "./components/Post/Post.tsx";
+import Search from "./components/Search/Search.tsx";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/post" element={<Post />} />
+          <Route path="/Search" element={<Search />} />
         </Routes>
       </Router>
     </>

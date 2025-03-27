@@ -3,17 +3,9 @@ import leftStrelka from "/arrow-left-solid.svg";
 import { useNavigate } from "react-router-dom";
 import { Input } from "../ui/input";
 import { Label } from "@radix-ui/react-label";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { LoaderCircle } from "lucide-react";
-import { usePostRequest } from "../Request/UsePostRequest";
-
-interface PostRequestOptions {
-  body: {
-    text: string;
-    image_id: number;
-  };
-}
 
 function Post() {
   const navigate = useNavigate();
@@ -21,13 +13,6 @@ function Post() {
   const [preview, setPreview] = useState<string | null>(null);
   const [caption, setCaption] = useState<string>("");
   const [message, setMessage] = useState<string | null>(null);
-  const [img_Id, setImg_Id] = useState<number>();
-  const {
-    data,
-    loading: loader,
-    error,
-    postData,
-  } = usePostRequest("https://social-backend-kzy5.onrender.com/posts/upload");
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setSelectedFile(file);
@@ -50,7 +35,6 @@ function Post() {
     const formData = new FormData();
     formData.append("file", selectedFile);
     formData.append("caption", caption);
-
     try {
       const response = await axios.post(
         "https://social-backend-kzy5.onrender.com/image/",
@@ -59,24 +43,25 @@ function Post() {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-      if (response.data.img_id) {
-        const newImgId = response.data.img_id;
-        setImg_Id(newImgId);
 
-        postData({
-          body: {
-            text: caption,
-            image_id: newImgId,
+      const newImgId = response.data.image_id;
+
+      await axios.post(
+        "https://social-backend-kzy5.onrender.com/posts/upload",
+        {
+          text: caption,
+          image_id: newImgId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            "Content-Type": "application/json", 
           },
-        } as PostRequestOptions);
-        setMessage("Post muvaffaqiyatli yuklandi! ✅");
-        navigate("/dashboard");
-      }
-      if (response.data) {
-        setTimeout(() => {
-          navigate("/dashboard");
-        }, 1500);
-      }
+        }
+      );
+
+      setMessage("Post muvaffaqiyatli yuklandi! ✅");
+      navigate("/dashboard");
     } catch (error) {
       setMessage("Xatolik yuz berdi, iltimos qayta urinib ko‘ring ❌");
     } finally {
@@ -131,7 +116,7 @@ function Post() {
             )}
           </Button>
           {message && <p className="text-white text-2xl mt-4">{message}</p>}
-          {error && <p className="text-red-500">Xatolik: {error}</p>}
+          {/* {error && <p className="text-red-500">Xatolik: {error}</p>} */}
         </div>
       </div>
     </div>

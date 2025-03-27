@@ -18,7 +18,6 @@ function Profile() {
   const [email, setEmail] = useState<string>("");
   const [followers, setFollowers] = useState<number>(0);
   const [followings, setFollowings] = useState<number>(0);
-  const [has_followed, setHas_Followed] = useState<boolean>(false);
   const [userImage, setUserImage] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -78,7 +77,6 @@ function Profile() {
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     const storedUsername = localStorage.getItem("username");
-    console.log(storedUsername);
 
     if (!token) {
       console.error("⚠️ Token topilmadi!");
@@ -92,7 +90,6 @@ function Profile() {
         params: { username: storedUsername },
       })
       .then((res) => {
-        console.log("✅ User data:", res.data);
         const userData =
           Array.isArray(res.data) && res.data.length > 0 ? res.data[0] : null;
 
