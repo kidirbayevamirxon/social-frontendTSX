@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import user from "/user-solid.svg";
+import { LoaderIcon } from "lucide-react";
 
 interface UserSearchResult {
   username: string;
@@ -112,7 +113,7 @@ function Search() {
 
       if (!token || !currentUsername) {
         toast.error("Avval tizimga kiring");
-        navigate("/login");
+        navigate("/ ");
         return;
       }
 
@@ -167,7 +168,7 @@ function Search() {
         } else if (err.response?.status === 401) {
           toast.error("Sessiya tugadi, iltimos qayta kiring");
           localStorage.removeItem("access_token");
-          navigate("/login");
+          navigate("/");
         } else {
           toast.error(err.response?.data?.message || "Follow qilishda xato");
         }
@@ -205,8 +206,8 @@ function Search() {
       </div>
 
       {isLoading && (
-        <div className="text-white text-center mt-8 text-2xl">
-          Izlanyapti...
+        <div className="text-white flex justify-center mt-8 text-2xl">
+          <LoaderIcon className="w-[50px] h-[50px]" />{" "}
         </div>
       )}
 
@@ -226,7 +227,7 @@ function Search() {
             </div>
 
             <div className="flex-grow space-y-3">
-              <p className="text-xl">
+              <p className="text-2xl">
                 <strong>Foydalanuvchi nomi:</strong> {userName}
               </p>
 
