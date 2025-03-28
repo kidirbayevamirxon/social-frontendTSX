@@ -10,7 +10,7 @@ type MyResponseType = {
   success?: boolean;
   message?: string;
   status?: number;
-  access_token?: string; // ✅ To‘g‘ridan-to‘g‘ri `result` ichida keladi
+  access_token?: string; 
   refresh_token?: string;
 };
 
@@ -43,8 +43,6 @@ function Sign() {
         },
       });
 
-      console.log("🔍 Backend natijasi:", result);
-
       if (
         result &&
         (result.message === "user successfully created" ||
@@ -54,7 +52,7 @@ function Sign() {
           localStorage.setItem("accessToken", result.access_token);
           localStorage.setItem("refreshToken", result.refresh_token || "");
         } 
-        navigate("/dashboard");
+        navigate("/");
       } 
     } catch (error) {
       console.error("❌ Serverga so‘rov yuborishda xatolik:", error);
