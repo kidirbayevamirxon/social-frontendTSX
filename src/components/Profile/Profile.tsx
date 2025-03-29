@@ -1,30 +1,32 @@
 import { Button } from "../ui/button";
-import leftStrelka from "/arrow-left-solid.svg";
 import user from "/user-solid (1).svg";
 import { useNavigate } from "react-router-dom";
 import { Input } from "../ui/input";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { LoaderCircle } from "lucide-react";
+import { Loader2, Mail, Users, UserPlus } from "lucide-react";
+import { toast } from "react-hot-toast";
+let userImg: string | null = null;
 
 function Profile() {
-  const [user_image, setUser_image] = useState<File | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const [first_name, setFirstName] = useState<string>("");
-  const [last_name, setLastName] = useState<string>("");
-  const [username, setUserName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [followers, setFollowers] = useState<number>(0);
-  const [followings, setFollowings] = useState<number>(0);
-  const [userImage, setUserImage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [userData, setUserData] = useState({
+    first_name: "",
+    last_name: "",
+    username: "",
+    email: "",
+    followers: 0,
+    followings: 0,
+    user_img: null as string | null
+  });
+  
   const [preview, setPreview] = useState<string | null>(null);
-
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
-    setUser_image(file);
-
+    setSelectedFile(file);
     if (file) {
       setPreview(URL.createObjectURL(file));
     } else {
@@ -32,24 +34,16 @@ function Profile() {
     }
   };
 
-  const handleUserImg = async (): Promise<void> => {
-    if (!user_image) {
-      setError("⚠️ Fayl tanlanmagan!");
+  const handleImageUpload = async () => {
+    if (!selectedFile) {
+      toast.error("Please select an image first");
       return;
     }
 
     const formData = new FormData();
-    formData.append("file", user_image);
-
-    let token = localStorage.getItem("access_token");
-
-    if (!token) {
-      setError("⚠️ Avtorizatsiya tokeni topilmadi!");
-      return;
-    }
+    formData.append("file", selectedFile);
 
     setLoading(true);
-
     try {
       const response = await axios.post(
         "https://social-backend-kzy5.onrender.com/image/user",
@@ -57,18 +51,18 @@ function Profile() {
         {
           headers: {
             "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
           },
         }
       );
 
       if (response.status === 200) {
-        setUserImage(preview);
-        setError(null);
+        toast.success("Profile picture updated successfully!");
+        setUserData(prev => ({ ...prev, user_img: preview }));
       }
-    } catch (err) {
-      console.error("❌ Rasm yuklashda xatolik:", err);
-      setError("❌ Rasm yuklashda muammo yuz berdi.");
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      toast.error("Failed to update profile picture");
     } finally {
       setLoading(false);
     }
@@ -76,100 +70,135 @@ function Profile() {
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");
-    const storedUsername = localStorage.getItem("username");
+    const username = localStorage.getItem("username");
 
-    if (!token) {
-      console.error("⚠️ Token topilmadi!");
+    if (!token || !username) {
       navigate("/");
       return;
     }
 
-    axios
-      .get("https://social-backend-kzy5.onrender.com/auth/user", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { username: storedUsername },
-      })
-      .then((res) => {
-        const userData =
-          Array.isArray(res.data) && res.data.length > 0 ? res.data[0] : null;
-
-        if (userData) {
-          setUser_image(userData.user_img || null);
-          setFirstName(userData.first_name || "No name");
-          setLastName(userData.last_name || "No surname");
-          setUserName(userData.username || "No username");
-          setFollowers(userData.followers || 0);
-          setFollowings(userData.followings || 0);
-          setEmail(userData.email || "No email");
-        } else {
-          console.error("❌ Foydalanuvchi ma'lumotlari topilmadi!");
-        }
-      })
-      .catch((error) => {
-        console.error("❌ Xatolik:", error.response?.data || error.message);
-      });
-  }, []);
-
+    axios.get("https://social-backend-kzy5.onrender.com/auth/user", {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { username }
+    })
+    .then(response => {
+      const data = Array.isArray(response.data) ? response.data[0] : response.data;
+      if (data) {
+        setUserData({
+          first_name: data.first_name || "Not set",
+          last_name: data.last_name || "Not set",
+          username: data.username || "Not set",
+          email: data.email || "Not set",
+          followers: data.followers || 0,
+          followings: data.followings || 0,
+          user_img: data.user_img || null
+        });
+      }
+    })
+    .catch(error => {
+      console.error("Error fetching user data:", error);
+      toast.error("Failed to load profile data");
+    });
+  }, [navigate]);
+  useEffect(() => {
+    userImg = userData.user_img;
+  }, [userData.user_img]);
   return (
-    <div className="bg-black w-full h-screen overflow-hidden">
-      <Button
-        className="w-[80px] h-18 ml-[10%] mt-14"
-        onClick={() => navigate("/dashboard")}
-      >
-        <img src={leftStrelka} alt="Back" className="w-xl h-15" />
-      </Button>
-      <div className="flex flex-col items-center">
-        <div className="w-[80%] h-auto bg-neutral-200 mt-20 rounded-3xl p-4">
-          <div className="w-[100%] h-auto rounded-3xl p-16 bg-white shadow-md shadow-orange-50">
-            <div className="text-center flex flex-col items-center gap-5">
-              <span className="text-xl">Will you change your avatar?</span>
-              <Input
-                type="file"
-                accept="image/*"
-                className="w-1xl"
-                onChange={handleFileChange}
-              />
-              {preview && (
+    <div className="min-h-screen bg-gray-100 p-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white rounded-xl shadow-md overflow-hidden mb-6">
+          <div className="p-8">
+            <div className="flex flex-col md:flex-row items-center gap-8">
+              <div className="relative group">
                 <img
-                  src={preview}
-                  alt="Avatar Preview"
-                  className="w-32 h-32 rounded-full object-cover"
+                  src={preview || userData.user_img || user}
+                  alt="Profile"
+                  className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
                 />
-              )}
-
-              <Button onClick={handleUserImg} disabled={loading}>
-                {loading ? (
-                  <LoaderCircle className="animate-spin w-8 h-8" />
-                ) : (
-                  "Upload"
-                )}
-              </Button>
-              {error && <p className="text-red-500">{error}</p>}
-            </div>
-          </div>
-        </div>
-        <div className="w-[80%] h-auto bg-neutral-200 mt-20 rounded-3xl p-4">
-          <div className="w-[100%] h-auto rounded-3xl p-8 bg-white shadow-md shadow-orange-50 flex justify-around items-center">
-            <div>
-              <div className="flex gap-8 items-center mt-4">
-                <img
-                  className="w-[60px] h-[60px] rounded-4xl"
-                  src={preview || userImage || user}
-                  alt="User Avatar"
-                />
-                <div>
-                  <p className="text-3xl">{username}</p>
-                  <p className="mt-2">{email}</p>
+                <label className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
+                  <span className="text-white text-sm">Change</span>
+                </label>
+              </div>
+              <div className="flex-1 text-center md:text-left">
+                <h1 className="text-3xl font-bold text-gray-800">
+                  {userData.first_name} {userData.last_name}
+                </h1>
+                <p className="text-gray-600 mt-1">@{userData.username}</p>
+                <p className="text-gray-500 mt-2 flex items-center justify-center md:justify-start">
+                  <Mail className="w-4 h-4 mr-2" />
+                  {userData.email}
+                </p>
+                <div className="flex gap-6 mt-4 justify-center md:justify-start">
+                  <div className="flex items-center text-gray-700">
+                    <Users className="w-5 h-5 mr-2" />
+                    <span>{userData.followers} Followers</span>
+                  </div>
+                  <div className="flex items-center text-gray-700">
+                    <UserPlus className="w-5 h-5 mr-2" />
+                    <span>{userData.followings} Following</span>
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="flex gap-8 w-xl pl-32">
-              <p className="text-2xl">{first_name}</p>
-              <p className="text-2xl">{last_name}</p>
+            {preview && (
+              <div className="mt-6 flex flex-col items-center gap-4">
+                <div className="flex gap-4">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setPreview(null)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    onClick={handleImageUpload}
+                    disabled={loading}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    {loading ? (
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    ) : null}
+                    Save Changes
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="bg-white rounded-xl shadow-md p-8">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+            Profile Information
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-medium text-gray-700 mb-2">First Name</h3>
+              <p className="text-gray-900 p-3 bg-gray-50 rounded-lg">
+                {userData.first_name}
+              </p>
             </div>
-            <div className="flex gap-4">
-              <p className="flex gap-4">Follow {followers}</p>
-              <p className="flex gap-4">Followed {followings}</p>
+            
+            <div>
+              <h3 className="text-lg font-medium text-gray-700 mb-2">Last Name</h3>
+              <p className="text-gray-900 p-3 bg-gray-50 rounded-lg">
+                {userData.last_name}
+              </p>
+            </div>
+            <div>
+              <h3 className="text-lg font-medium text-gray-700 mb-2">Username</h3>
+              <p className="text-gray-900 p-3 bg-gray-50 rounded-lg">
+                @{userData.username}
+              </p>
+            </div>
+            <div>
+              <h3 className="text-lg font-medium text-gray-700 mb-2">Email</h3>
+              <p className="text-gray-900 p-3 bg-gray-50 rounded-lg">
+                {userData.email}
+              </p>
             </div>
           </div>
         </div>
@@ -177,5 +206,5 @@ function Profile() {
     </div>
   );
 }
-
+export { userImg };
 export default Profile;
