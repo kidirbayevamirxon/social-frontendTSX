@@ -39,17 +39,28 @@ function UserProfile() {
           navigate("/");
           return;
         }
+
+        console.log(`Foydalanuvchi profili yuklanmoqda: ${username}`);
+
         const response = await axios.get(
-          `https://social-backend-kzy5.onrender.com/auth/user/${username}`,
+          `https://social-backend-kzy5.onrender.com/auth/user`, // ✅ To‘g‘ri API yo‘li
           {
+            params: { username }, // ✅ Query orqali username yuboriladi
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
-        setUser(response.data);
-        setIsFollowing(response.data.has_followed);
-        setFollowersCount(response.data.followers || 0);
+
+        if (!response.data || response.data.length === 0) {
+          toast.error("Foydalanuvchi topilmadi");
+          return;
+        }
+
+        const userData = response.data[0]; // Faqat bitta user olinadi
+        setUser(userData);
+        setIsFollowing(userData.has_followed);
+        setFollowersCount(userData.followers || 0);
       } catch (error) {
         console.error("Foydalanuvchi profilini yuklashda xatolik:", error);
 
@@ -143,10 +154,10 @@ function UserProfile() {
             </div>
             <Button
               variant={isFollowing ? "outline" : "default"}
-              className="w-full md:w-auto px-6"
+              className="w-full md:w-auto px-6 m-auto"
               onClick={handleFollow}
             >
-              {isFollowing ? "Kuzatilmoqda" : "Kuzatish"}
+              {isFollowing ? "Followed" : "Follow"}
             </Button>
           </div>
 
@@ -172,14 +183,6 @@ function UserProfile() {
                 <p className="text-gray-500 text-sm">Kuzatilganlar</p>
               </div>
             </div>
-
-            <div className="mb-6">
-              <h3 className="font-semibold text-gray-800 mb-2">Ma'lumot</h3>
-              <p className="text-gray-600">
-                {/* {user.bio || "Ma'lumot kiritilmagan"} */}
-              </p>
-            </div>
-
             <div>
               <h3 className="font-semibold text-gray-800 mb-2">Aloqa</h3>
               <p className="text-gray-600">{user.email}</p>
