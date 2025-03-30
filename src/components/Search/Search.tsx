@@ -1,17 +1,19 @@
 import { Button } from "../ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Input } from "../ui/input";
-import searchIconBlack from "/searchIconBlack.svg"
+import searchIconBlack from "/searchIconBlack.svg";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import defaultUser from "/user-solid.svg";
+import defaultUser from "/user-solid (1).svg";
 import { Loader2 } from "lucide-react";
 
 interface UserSearchResult {
   username: string;
   has_followed: boolean;
   user_img: string;
+  first_name: string;
+  last_name: string;
 }
 
 function Search() {
@@ -151,37 +153,48 @@ function Search() {
             {searchResults.map((user) => (
               <div
                 key={user.username}
-                className="bg-white rounded-xl shadow-sm p-4 border border-gray-200"
+                className="bg-white rounded-xl shadow-sm p-4 border border-gray-200 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center gap-4">
-                  <div className="relative">
-                    <img
-                      src={user.user_img}
-                      alt={user.username}
-                      className="w-12 h-12 rounded-full object-cover border-2 border-indigo-100"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = defaultUser;
-                      }}
-                    />
-                    {user.has_followed && (
-                      <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-800">
-                      {user.username}
-                    </h3>
-                    <p className="text-sm text-gray-500">
-                      {user.has_followed ? "Following" : "Not following"}
-                    </p>
-                  </div>
+                  <Link
+                    to={`/dashboard/profile/${user.username}`}
+                    className="flex items-center gap-4 flex-1"
+                  >
+                    <div className="relative">
+                      <img
+                        src={user.user_img}
+                        alt={user.username}
+                        className="w-12 h-12 rounded-full object-cover border-2 border-indigo-100"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = defaultUser;
+                        }}
+                      />
+                      {user.has_followed && (
+                        <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-800 hover:text-indigo-600">
+                        {user.username}
+                      </h3>
+                      {user.first_name && user.last_name && (
+                        <p className="text-sm text-gray-500">
+                          {user.first_name} {user.last_name}
+                        </p>
+                      )}
+                      <p className="text-sm text-gray-500">
+                        {user.has_followed ? "Following" : "Not following"}
+                      </p>
+                    </div>
+                  </Link>
                   <Button
                     variant={user.has_followed ? "outline" : "default"}
                     className="rounded-full px-6"
-                    onClick={() =>
-                      handleFollow(user.username, user.has_followed)
-                    }
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleFollow(user.username, user.has_followed);
+                    }}
                     disabled={isFollowing[user.username]}
                   >
                     {isFollowing[user.username] ? (

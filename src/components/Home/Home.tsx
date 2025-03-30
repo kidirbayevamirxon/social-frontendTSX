@@ -29,13 +29,9 @@ function Home() {
   const [content, setContent] = useState("");
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
   const [comments, setComments] = useState<any[]>([]);
-  const {
-    data,
-    loading,
-    error: errorpost,
-    postData,
-  } = usePostRequest("https://social-backend-kzy5.onrender.com/comments");
-  console.log(data, loading, errorpost);
+  const { postData } = usePostRequest(
+    "https://social-backend-kzy5.onrender.com/comments"
+  );
 
   const fetchPosts = async (loadMore = false) => {
     setIsLoading(true);

@@ -7,7 +7,10 @@ import Profile from "./components/Profile/Profile.tsx";
 import Post from "./components/Post/Post.tsx";
 import Search from "./components/Search/Search.tsx";
 import Home from "./components/Home/Home.tsx";
+import NotFound from "./components/Error/Error.tsx";
+import UserProfile from "./components/UserProfile/UserProfile.tsx";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 function App() {
   return (
     <>
@@ -19,9 +22,11 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />}>
             <Route path="home" element={<Home />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="profile/:username" element={<UserProfile />} /> 
             <Route path="post" element={<Post />} />
-            <Route path="Search" element={<Search />} />
+            <Route path="search" element={<Search />} />
           </Route>
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
     </>
