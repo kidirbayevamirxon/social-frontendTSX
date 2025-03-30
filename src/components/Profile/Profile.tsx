@@ -6,7 +6,10 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Loader2, Mail, Users, UserPlus } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { getLocalStorageImage, setLocalStorageImage } from '../../utils/storageUtils';
+import {
+  getLocalStorageImage,
+  setLocalStorageImage,
+} from "../../utils/storageUtils";
 
 function Profile() {
   const navigate = useNavigate();
@@ -68,7 +71,12 @@ function Profile() {
       }
     } catch (error) {
       console.error("Error uploading image:", error);
-      toast.error("Failed to update profile picture");
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        toast.error("Tizimga qayta kiring!");
+        navigate("/");
+      } else {
+        toast.error("Failed to update profile picture");
+      }
     } finally {
       setLoading(false);
     }
@@ -110,7 +118,12 @@ function Profile() {
       })
       .catch((error) => {
         console.error("Error fetching user data:", error);
-        toast.error("Failed to load user data");
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+          toast.error("Tizimga qayta kiring!");
+          navigate("/");
+        } else {
+          toast.error("Failed to load user data");
+        }
       });
   }, [navigate]);
   return (

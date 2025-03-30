@@ -7,6 +7,7 @@ import Modal from "../Modal/Modal";
 import { Heart, MessageCircle, MoreHorizontal, Loader2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { usePostRequest } from "../Request/UsePostRequest";
+import { useNavigate } from "react-router-dom";
 
 interface Post {
   id: number;
@@ -32,7 +33,7 @@ function Home() {
   const { postData } = usePostRequest(
     "https://social-backend-kzy5.onrender.com/comments"
   );
-
+  const navigate = useNavigate();
   const fetchPosts = async (loadMore = false) => {
     setIsLoading(true);
     setError(null);
@@ -58,8 +59,14 @@ function Home() {
       }
     } catch (err) {
       console.error("Error fetching posts:", err);
-      setError("Failed to load posts");
-      toast.error("Failed to load posts");
+
+      if (axios.isAxiosError(err) && err.response?.status === 401) {
+        toast.error("Iltimos, tizimga qayta kiring!");
+        navigate("/");
+      } else {
+        setError("Failed to load posts");
+        toast.error("Failed to load posts");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -93,7 +100,13 @@ function Home() {
       setComments(res.data);
     } catch (error) {
       console.error("Xatolik yuz berdi:", error);
-      toast.error("Komment yuborilmadi!");
+
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        toast.error("Tizimga qayta kiring!");
+        navigate("/");
+      } else {
+        toast.error("Komment yuborilmadi!");
+      }
     }
   };
   const token = localStorage.getItem("access_token");
@@ -105,7 +118,13 @@ function Home() {
           { headers: { Authorization: `Bearer ${token}` } }
         )
         .then((res) => setComments(res.data))
-        .catch((err) => console.error("Kommentlarni olishda xatolik:", err));
+        .catch((err) => {
+          console.error("Kommentlarni olishda xatolik:", err);
+          if (axios.isAxiosError(err) && err.response?.status === 401) {
+            toast.error("Tizimga qayta kiring!");
+            navigate("/");
+          }
+        });
     }
   }, [isOpen, selectedPostId]);
   const handleLike = async (postId: number) => {
@@ -136,7 +155,13 @@ function Home() {
       );
     } catch (err) {
       console.error("Error liking post:", err);
-      toast.error("Failed to like post");
+
+      if (axios.isAxiosError(err) && err.response?.status === 401) {
+        toast.error("Tizimga qayta kiring!");
+        navigate("/");
+      } else {
+        toast.error("Failed to like post");
+      }
     }
   };
 

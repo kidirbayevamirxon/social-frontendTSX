@@ -64,7 +64,13 @@ function Post() {
       navigate("/dashboard/home");
     } catch (error) {
       console.error("Error creating post:", error);
-      toast.error("Failed to create post. Please try again.");
+
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        toast.error("Tizimga qayta kiring!");
+        navigate("/");
+      } else {
+        toast.error("Failed to create post. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

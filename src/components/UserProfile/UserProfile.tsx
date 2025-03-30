@@ -43,9 +43,9 @@ function UserProfile() {
         console.log(`Foydalanuvchi profili yuklanmoqda: ${username}`);
 
         const response = await axios.get(
-          `https://social-backend-kzy5.onrender.com/auth/user`, // ✅ To‘g‘ri API yo‘li
+          `https://social-backend-kzy5.onrender.com/auth/user`, 
           {
-            params: { username }, // ✅ Query orqali username yuboriladi
+            params: { username },
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -57,7 +57,7 @@ function UserProfile() {
           return;
         }
 
-        const userData = response.data[0]; // Faqat bitta user olinadi
+        const userData = response.data[0]; 
         setUser(userData);
         setIsFollowing(userData.has_followed);
         setFollowersCount(userData.followers || 0);

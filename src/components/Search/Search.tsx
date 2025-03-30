@@ -101,9 +101,15 @@ function Search() {
             : user
         )
       );
-    } catch (error) {
+    }  catch (error) {
       console.error("Follow error:", error);
-      toast.error("Amalni bajarishda xato");
+  
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        toast.error("Iltimos, tizimga qayta kiring");
+        navigate("/"); 
+      } else {
+        toast.error("Amalni bajarishda xato");
+      }
     } finally {
       setIsFollowing((prev) => ({ ...prev, [username]: false }));
     }
