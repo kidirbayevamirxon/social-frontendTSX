@@ -59,7 +59,7 @@ function Post() {
       );
 
       toast.success("Post created successfully!");
-      navigate("/dashboard");
+      navigate("/dashboard/home");
     } catch (error) {
       console.error("Error creating post:", error);
       toast.error("Failed to create post. Please try again.");

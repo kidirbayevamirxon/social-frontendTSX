@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Loader2, Mail, Users, UserPlus } from "lucide-react";
 import { toast } from "react-hot-toast";
-let userImg: string | null = null;
+import { getLocalStorageImage, setLocalStorageImage } from '../../utils/storageUtils';
 
 function Profile() {
   const navigate = useNavigate();
@@ -18,20 +18,21 @@ function Profile() {
     email: "",
     followers: 0,
     followings: 0,
-    user_img: null as string | null
+    user_img: getLocalStorageImage(),
   });
-  
+
   const [preview, setPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  
+
+  const getSafeImageUrl = (imgUrl: string | null) => {
+    if (preview) return preview;
+    return imgUrl ? `${imgUrl}?t=${Date.now()}` : user;
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setSelectedFile(file);
-    if (file) {
-      setPreview(URL.createObjectURL(file));
-    } else {
-      setPreview(null);
-    }
+    setPreview(file ? URL.createObjectURL(file) : null);
   };
 
   const handleImageUpload = async () => {
@@ -57,8 +58,13 @@ function Profile() {
       );
 
       if (response.status === 200) {
+        const newImageUrl = response.data.image_url;
+        setLocalStorageImage(newImageUrl);
         toast.success("Profile picture updated successfully!");
-        setUserData(prev => ({ ...prev, user_img: preview }));
+        localStorage.setItem("userImage", newImageUrl);
+        setUserData((prev) => ({ ...prev, user_img: newImageUrl }));
+        setPreview(null);
+        window.dispatchEvent(new Event("storage"));
       }
     } catch (error) {
       console.error("Error uploading image:", error);
@@ -77,32 +83,36 @@ function Profile() {
       return;
     }
 
-    axios.get("https://social-backend-kzy5.onrender.com/auth/user", {
-      headers: { Authorization: `Bearer ${token}` },
-      params: { username }
-    })
-    .then(response => {
-      const data = Array.isArray(response.data) ? response.data[0] : response.data;
-      if (data) {
-        setUserData({
-          first_name: data.first_name || "Not set",
-          last_name: data.last_name || "Not set",
-          username: data.username || "Not set",
-          email: data.email || "Not set",
-          followers: data.followers || 0,
-          followings: data.followings || 0,
-          user_img: data.user_img || null
-        });
-      }
-    })
-    .catch(error => {
-      console.error("Error fetching user data:", error);
-      toast.error("Failed to load profile data");
-    });
+    axios
+      .get("https://social-backend-kzy5.onrender.com/auth/user", {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { username },
+      })
+      .then((response) => {
+        const data = Array.isArray(response.data)
+          ? response.data[0]
+          : response.data;
+        if (data) {
+          const imgUrl = data.user_img || null;
+          setUserData({
+            first_name: data.first_name || "Not set",
+            last_name: data.last_name || "Not set",
+            username: data.username || "Not set",
+            email: data.email || "Not set",
+            followers: data.followers || 0,
+            followings: data.followings || 0,
+            user_img: imgUrl,
+          });
+          if (imgUrl) {
+            localStorage.setItem("userImage", imgUrl);
+          }
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching user data:", error);
+        toast.error("Failed to load user data");
+      });
   }, [navigate]);
-  useEffect(() => {
-    userImg = userData.user_img;
-  }, [userData.user_img]);
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-4xl mx-auto">
@@ -111,9 +121,12 @@ function Profile() {
             <div className="flex flex-col md:flex-row items-center gap-8">
               <div className="relative group">
                 <img
-                  src={preview || userData.user_img || user}
+                  src={getSafeImageUrl(userData.user_img || user)}
                   alt="Profile"
                   className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = user;
+                  }}
                 />
                 <label className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                   <Input
@@ -149,13 +162,10 @@ function Profile() {
             {preview && (
               <div className="mt-6 flex flex-col items-center gap-4">
                 <div className="flex gap-4">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setPreview(null)}
-                  >
+                  <Button variant="outline" onClick={() => setPreview(null)}>
                     Cancel
                   </Button>
-                  <Button 
+                  <Button
                     onClick={handleImageUpload}
                     disabled={loading}
                     className="bg-blue-600 hover:bg-blue-700"
@@ -176,20 +186,26 @@ function Profile() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h3 className="text-lg font-medium text-gray-700 mb-2">First Name</h3>
+              <h3 className="text-lg font-medium text-gray-700 mb-2">
+                First Name
+              </h3>
               <p className="text-gray-900 p-3 bg-gray-50 rounded-lg">
                 {userData.first_name}
               </p>
             </div>
-            
+
             <div>
-              <h3 className="text-lg font-medium text-gray-700 mb-2">Last Name</h3>
+              <h3 className="text-lg font-medium text-gray-700 mb-2">
+                Last Name
+              </h3>
               <p className="text-gray-900 p-3 bg-gray-50 rounded-lg">
                 {userData.last_name}
               </p>
             </div>
             <div>
-              <h3 className="text-lg font-medium text-gray-700 mb-2">Username</h3>
+              <h3 className="text-lg font-medium text-gray-700 mb-2">
+                Username
+              </h3>
               <p className="text-gray-900 p-3 bg-gray-50 rounded-lg">
                 @{userData.username}
               </p>
@@ -206,5 +222,4 @@ function Profile() {
     </div>
   );
 }
-export { userImg };
 export default Profile;

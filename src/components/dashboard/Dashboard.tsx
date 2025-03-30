@@ -4,22 +4,54 @@ import profile from "/user-solid.svg";
 import plus from "/circle-plus-solid.svg";
 import search from "/magnifying-glass-solid.svg";
 import { Outlet } from "react-router-dom";
-import { userImg } from "../Profile/Profile";
+import { useState, useEffect } from "react";
+import { getLocalStorageImage } from "@/utils/storageUtils";
+
 function Dashboard() {
   const location = useLocation();
-  // @ts-ignore
-  const applyImageFilter = (imgPath: string) => {
-    return {
-      filter: "brightness(0) invert(1)",
-      transition: "filter 0.3s ease",
-      opacity: 0.9,
+  const [userImage, setUserImage] = useState<string>(profile);
+
+  // Rasmni yuklash va yangilash
+  useEffect(() => {
+    const updateImage = () => {
+      const img = getLocalStorageImage();
+      setUserImage(img ? `${img}?t=${Date.now()}` : profile);
     };
+
+    // Dastlabki yuklash
+    updateImage();
+
+    // Storage o'zgarishlarini kuzatish
+    const handleStorageChange = () => {
+      updateImage();
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  // Icon filter style
+  const applyImageFilter = (isActive: boolean) => {
+    return isActive
+      ? {}
+      : {
+          filter: "brightness(0) invert(1)",
+          transition: "filter 0.3s ease",
+          opacity: 0.9,
+        };
   };
 
+  // Aktiv linkni aniqlash
   const isActive = (path: string) => {
-    const currentPath = location.pathname.toLowerCase();
-    return currentPath.includes(path.toLowerCase());
+    return location.pathname.toLowerCase().includes(path.toLowerCase());
   };
+
+  // Navigation items
+  const navItems = [
+    { path: "home", icon: home, label: "Home" },
+    { path: "search", icon: search, label: "Search" },
+    { path: "post", icon: plus, label: "Post" },
+  ];
 
   return (
     <div className="flex h-screen bg-gray-900">
@@ -28,67 +60,48 @@ function Dashboard() {
 
         <div className="flex flex-col flex-grow justify-between">
           <div className="space-y-8">
-            <Link
-              to="home"
-              className={`flex items-center gap-4 p-3 rounded-lg ${
-                isActive("/home") ? "bg-gray-800" : "hover:bg-gray-800"
-              }`}
-            >
-              <img
-                src={home}
-                alt="Home"
-                style={applyImageFilter(home)}
-                className="w-6 h-6"
-              />
-              <span className="text-amber-50 text-xl">Home</span>
-            </Link>
-
-            <Link
-              to="search"
-              className={`flex items-center gap-4 p-3 rounded-lg ${
-                isActive("/search") ? "bg-gray-800" : "hover:bg-gray-800"
-              }`}
-            >
-              <img
-                src={search}
-                alt="Search"
-                style={applyImageFilter(search)}
-                className="w-6 h-6"
-              />
-              <span className="text-amber-50 text-xl">Search</span>
-            </Link>
-
-            <Link
-              to="post"
-              className={`flex items-center gap-4 p-3 rounded-lg ${
-                isActive("/post") ? "bg-gray-800" : "hover:bg-gray-800"
-              }`}
-            >
-              <img
-                src={plus}
-                alt="Post"
-                style={applyImageFilter(plus)}
-                className="w-6 h-6"
-              />
-              <span className="text-amber-50 text-xl">Post</span>
-            </Link>
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center gap-4 p-3 rounded-lg ${
+                  isActive(item.path) ? "bg-gray-800" : "hover:bg-gray-800"
+                }`}
+              >
+                <img
+                  src={item.icon}
+                  alt={item.label}
+                  style={applyImageFilter(isActive(item.path))}
+                  className="w-6 h-6"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = "none";
+                  }}
+                />
+                <span className="text-amber-50 text-xl">{item.label}</span>
+              </Link>
+            ))}
           </div>
+
           <Link
             to="profile"
             className={`flex items-center gap-4 p-3 rounded-lg ${
-              isActive("/profile") ? "bg-gray-800" : "hover:bg-gray-800"
+              isActive("profile") ? "bg-gray-800" : "hover:bg-gray-800"
             }`}
           >
             <img
-  src={userImg || profile}
-  alt="Profile"
-  style={applyImageFilter(userImg || profile)}
-  className="w-7 h-7 rounded-2xl object-cover border border-gray-300"
-/>
+              src={userImage}
+              alt="Profile"
+              style={applyImageFilter(isActive("profile"))}
+              className="w-7 h-7 rounded-2xl object-cover border border-gray-300"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = profile;
+              }}
+            />
             <span className="text-amber-50 text-xl">Profile</span>
           </Link>
         </div>
       </div>
+
       <div className="flex-1 overflow-y-auto bg-gray-900 p-6">
         <Outlet />
       </div>
