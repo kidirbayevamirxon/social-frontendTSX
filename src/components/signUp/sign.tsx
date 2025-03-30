@@ -3,17 +3,16 @@ import { usePostRequest } from "../Request/UsePostRequest";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "@radix-ui/react-label";
-import { useNavigate } from "react-router-dom";
+import {Link, useNavigate } from "react-router-dom";
 import { LoaderCircle } from "lucide-react";
 
 type MyResponseType = {
   success?: boolean;
   message?: string;
   status?: number;
-  access_token?: string; 
+  access_token?: string;
   refresh_token?: string;
 };
-
 
 function Sign() {
   const [first_name, setFirstName] = useState("");
@@ -51,72 +50,123 @@ function Sign() {
         if (result.access_token) {
           localStorage.setItem("accessToken", result.access_token);
           localStorage.setItem("refreshToken", result.refresh_token || "");
-        } 
+        }
         navigate("/");
-      } 
+      }
     } catch (error) {
-      console.error("❌ Serverga so‘rov yuborishda xatolik:", error);
+      console.error("❌ Serverga so'rov yuborishda xatolik:", error);
     }
   };
 
   return (
-    <div className="p-0">
-      <div className="w-1/4 h-1/2 border border-black my-24 mx-auto rounded-[20px] p-0">
-        <div className="flex justify-center">
-          <h2 className="text-5xl mt-6">SIGN UP</h2>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div className="bg-indigo-600 py-6 px-8 text-center">
+          <h2 className="text-3xl font-bold text-white">Ro'yxatdan o'tish</h2>
         </div>
-        <form className="flex flex-col p-8 gap-4" onSubmit={handleSubmit}>
-          <Label htmlFor="first-name">First-Name</Label>
-          <Input
-            placeholder="First-Name"
-            id="first-name"
-            value={first_name}
-            onChange={(e) => setFirstName(e.target.value)}
-            required
-          />
 
-          <Label htmlFor="last-name">Last-Name</Label>
-          <Input
-            placeholder="Last-Name"
-            id="last-name"
-            value={last_name}
-            onChange={(e) => setLastName(e.target.value)}
-            required
-          />
+        <form className="p-8 space-y-4" onSubmit={handleSubmit}>
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+              {error}
+            </div>
+          )}
 
-          <Label htmlFor="username">Username</Label>
-          <Input
-            placeholder="Username"
-            id="username"
-            value={username}
-            onChange={(e) => setUserName(e.target.value)}
-            required
-          />
-          <Label htmlFor="email">Email</Label>
-          <Input
-            placeholder="Email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <Label htmlFor="password">Password</Label>
-          <Input
-            type="password"
-            placeholder="Password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <Button type="submit">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="first-name" className="block text-sm font-medium text-gray-700">
+                Ism
+              </Label>
+              <Input
+                placeholder="Ismingiz"
+                id="first-name"
+                value={first_name}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="last-name" className="block text-sm font-medium text-gray-700">
+                Familiya
+              </Label>
+              <Input
+                placeholder="Familiyangiz"
+                id="last-name"
+                value={last_name}
+                onChange={(e) => setLastName(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="username" className="block text-sm font-medium text-gray-700">
+              Foydalanuvchi nomi
+            </Label>
+            <Input
+              placeholder="Foydalanuvchi nomingiz"
+              id="username"
+              value={username}
+              onChange={(e) => setUserName(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              Elektron pochta
+            </Label>
+            <Input
+              type="email"
+              placeholder="example@mail.com"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              Parol
+            </Label>
+            <Input
+              type="password"
+              placeholder="Kuchli parol yarating"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              required
+            />
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200 mt-4"
+            disabled={loading}
+          >
             {loading ? (
-              <LoaderCircle className="animate-spin w-8 h-8" />
+              <div className="flex items-center justify-center">
+                <LoaderCircle className="animate-spin mr-2" />
+                Ro'yxatdan o'tilmoqda...
+              </div>
             ) : (
-              "Submit"
+              "Ro'yxatdan o'tish"
             )}
           </Button>
-          {error && <p className="text-red-500">Xatolik: {error}</p>}
+
+          <div className="text-center text-sm text-gray-600 mt-4">
+            Allaqachon hisobingiz bormi?{" "}
+            <Link to="/" className="text-indigo-600 hover:text-indigo-800 font-medium hover:underline">
+            Tizimga kirish
+            </Link>
+          </div>
         </form>
       </div>
     </div>

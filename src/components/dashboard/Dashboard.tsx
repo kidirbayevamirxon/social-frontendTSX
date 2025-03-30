@@ -10,100 +10,98 @@ import { getLocalStorageImage } from "@/utils/storageUtils";
 function Dashboard() {
   const location = useLocation();
   const [userImage, setUserImage] = useState<string>(profile);
-
-  // Rasmni yuklash va yangilash
   useEffect(() => {
     const updateImage = () => {
       const img = getLocalStorageImage();
       setUserImage(img ? `${img}?t=${Date.now()}` : profile);
     };
-
-    // Dastlabki yuklash
     updateImage();
-
-    // Storage o'zgarishlarini kuzatish
     const handleStorageChange = () => {
       updateImage();
     };
-
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
-
-  // Icon filter style
-  const applyImageFilter = (isActive: boolean) => {
-    return isActive
-      ? {}
-      : {
-          filter: "brightness(0) invert(1)",
-          transition: "filter 0.3s ease",
-          opacity: 0.9,
-        };
-  };
-
-  // Aktiv linkni aniqlash
   const isActive = (path: string) => {
     return location.pathname.toLowerCase().includes(path.toLowerCase());
   };
-
-  // Navigation items
   const navItems = [
     { path: "home", icon: home, label: "Home" },
     { path: "search", icon: search, label: "Search" },
-    { path: "post", icon: plus, label: "Post" },
+    { path: "post", icon: plus, label: "Create" },
   ];
 
   return (
-    <div className="flex h-screen bg-gray-900">
-      <div className="w-64 h-full bg-black text-center p-6 flex flex-col">
-        <h2 className="text-amber-50 text-4xl font-bold mb-16">Logo</h2>
+    <div className="flex h-screen bg-gray-100">
+      <div className="w-20 md:w-64 h-full bg-indigo-900 text-center p-4 md:p-6 flex flex-col transition-all duration-300">
+        <div className="mb-10 md:mb-16">
+          <h2 className="hidden md:block text-white text-2xl md:text-4xl font-bold">SocialApp</h2>
+          <div className="md:hidden flex justify-center">
+            <span className="text-white text-2xl font-bold">S</span>
+          </div>
+        </div>
 
         <div className="flex flex-col flex-grow justify-between">
-          <div className="space-y-8">
+          <div className="space-y-4 md:space-y-6">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-4 p-3 rounded-lg ${
-                  isActive(item.path) ? "bg-gray-800" : "hover:bg-gray-800"
+                className={`flex items-center justify-center md:justify-start gap-3 p-3 rounded-lg transition-colors ${
+                  isActive(item.path) 
+                    ? "bg-indigo-700 shadow-md" 
+                    : "hover:bg-indigo-800"
                 }`}
               >
                 <img
                   src={item.icon}
                   alt={item.label}
-                  style={applyImageFilter(isActive(item.path))}
-                  className="w-6 h-6"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = "none";
+                  className={`w-5 h-5 md:w-6 md:h-6 ${
+                    isActive(item.path) ? "text-white" : "text-gray-300"
+                  }`}
+                  style={{
+                    filter: isActive(item.path) 
+                      ? "brightness(0) invert(1)" 
+                      : "brightness(0) invert(0.8)"
                   }}
                 />
-                <span className="text-amber-50 text-xl">{item.label}</span>
+                <span className="hidden md:block text-white text-lg md:text-xl">
+                  {item.label}
+                </span>
               </Link>
             ))}
           </div>
-
           <Link
             to="profile"
-            className={`flex items-center gap-4 p-3 rounded-lg ${
-              isActive("profile") ? "bg-gray-800" : "hover:bg-gray-800"
+            className={`flex items-center justify-center md:justify-start gap-3 p-3 rounded-lg transition-colors ${
+              isActive("profile") 
+                ? "bg-indigo-700 shadow-md" 
+                : "hover:bg-indigo-800"
             }`}
           >
-            <img
-              src={userImage}
-              alt="Profile"
-              style={applyImageFilter(isActive("profile"))}
-              className="w-7 h-7 rounded-2xl object-cover border border-gray-300"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = profile;
-              }}
-            />
-            <span className="text-amber-50 text-xl">Profile</span>
+            <div className="relative">
+              <img
+                src={userImage}
+                alt="Profile"
+                className="w-7 h-7 md:w-8 md:h-8 rounded-full object-cover border-2 border-white"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = profile;
+                }}
+              />
+              {isActive("profile") && (
+                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-indigo-900"></div>
+              )}
+            </div>
+            <span className="hidden md:block text-white text-lg md:text-xl">
+              Profile
+            </span>
           </Link>
         </div>
       </div>
-
-      <div className="flex-1 overflow-y-auto bg-gray-900 p-6">
-        <Outlet />
+      <div className="flex-1 overflow-y-auto bg-gray-100 p-4 md:p-8">
+        <div className="max-w-6xl mx-auto">
+          <Outlet />
+        </div>
       </div>
     </div>
   );
