@@ -9,27 +9,32 @@ import { toast } from "react-hot-toast";
 import {
   getLocalStorageImage,
   setLocalStorageImage,
+  isValidHttpUrl,
 } from "../../utils/storageUtils";
 
 function Profile() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [userData, setUserData] = useState({
-    first_name: "",
-    last_name: "",
-    username: "",
-    email: "",
-    followers: 0,
-    followings: 0,
-    user_img: getLocalStorageImage(),
+  const [userData, setUserData] = useState(() => {
+    const initialImg = getLocalStorageImage();
+    return {
+      first_name: "",
+      last_name: "",
+      username: "",
+      email: "",
+      followers: 0,
+      followings: 0,
+      user_img: initialImg || user,
+    };
   });
 
   const [preview, setPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const getSafeImageUrl = (imgUrl: string | null) => {
+  const getSafeImageUrl = (imgUrl: string | null): string => {
     if (preview) return preview;
-    return imgUrl ? `${imgUrl}?t=${Date.now()}` : user;
+    if (!imgUrl) return user;
+    return `${imgUrl}${imgUrl.includes("?") ? "&" : "?"}t=${Date.now()}`;
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,13 +45,17 @@ function Profile() {
 
   const handleImageUpload = async () => {
     if (!selectedFile) {
-      toast.error("Please select an image first");
+      toast.error("Iltimos, avval rasm tanlang");
       return;
     }
-
+    if (!isValidImage(selectedFile)) {
+      toast.error(
+        "Iltimos, 5MB dan kichik va JPEG/PNG formatidagi rasm tanlang"
+      );
+      return;
+    }
     const formData = new FormData();
     formData.append("file", selectedFile);
-
     setLoading(true);
     try {
       const response = await axios.post(
@@ -59,27 +68,29 @@ function Profile() {
           },
         }
       );
+      localStorage.setItem("userImage", response.data.user_image);
 
-      if (response.status === 200) {
+      if (response.status === 200 && response.data.image_url) {
         const newImageUrl = response.data.image_url;
+        if (!isValidHttpUrl(newImageUrl)) {
+          throw new Error("Noto‘g‘ri rasm URLi qaytarildi");
+        }
         setLocalStorageImage(newImageUrl);
-        toast.success("Profile picture updated successfully!");
-        localStorage.setItem("userImage", newImageUrl);
         setUserData((prev) => ({ ...prev, user_img: newImageUrl }));
         setPreview(null);
-        window.dispatchEvent(new Event("storage"));
+        toast.success("Profil rasmi muvaffaqiyatli yangilandi!");
       }
     } catch (error) {
-      console.error("Error uploading image:", error);
-      if (axios.isAxiosError(error) && error.response?.status === 401) {
-        toast.error("Tizimga qayta kiring!");
-        navigate("/");
-      } else {
-        toast.error("Failed to update profile picture");
-      }
+      console.error("Rasm yuklashda xato:", error);
+      toast.error("Rasm yuklash muvaffaqiyatsiz");
     } finally {
       setLoading(false);
     }
+  };
+
+  const isValidImage = (file: File): boolean => {
+    const validTypes = ["image/jpeg", "image/png", "image/webp"];
+    return validTypes.includes(file.type) && file.size <= 5 * 1024 * 1024;
   };
 
   useEffect(() => {
@@ -101,7 +112,12 @@ function Profile() {
           ? response.data[0]
           : response.data;
         if (data) {
-          const imgUrl = data.user_img || null;
+          const storedImg = getLocalStorageImage(); 
+          const imgUrl =
+            data.user_img && isValidHttpUrl(data.user_img)
+              ? data.user_img
+              : storedImg || user;
+
           setUserData({
             first_name: data.first_name || "Not set",
             last_name: data.last_name || "Not set",
@@ -111,21 +127,23 @@ function Profile() {
             followings: data.followings || 0,
             user_img: imgUrl,
           });
-          if (imgUrl) {
-            localStorage.setItem("userImage", imgUrl);
+
+          if (data.user_img && isValidHttpUrl(data.user_img)) {
+            setLocalStorageImage(data.user_img);
           }
         }
       })
       .catch((error) => {
-        console.error("Error fetching user data:", error);
+        console.error("Foydalanuvchi ma'lumotlarini olishda xato:", error);
         if (axios.isAxiosError(error) && error.response?.status === 401) {
           toast.error("Tizimga qayta kiring!");
           navigate("/");
         } else {
-          toast.error("Failed to load user data");
+          toast.error("Foydalanuvchi ma'lumotlarini yuklab bo'lmadi");
         }
       });
   }, [navigate]);
+
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-4xl mx-auto">
