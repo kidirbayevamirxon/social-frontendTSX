@@ -131,23 +131,25 @@ function Login() {
           </div>
         </form>
       </div>
-      <div className="fixed top-4 right-4 z-50">
-        <button
-          className="p-2 rounded-full bg-white shadow-md hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          onClick={() => setIsOpen(true)}
-          aria-label="Settings"
-        >
-          <img
-            src={settings}
-            alt="Settings"
-            className="w-6 h-6 text-gray-700"
-          />
-        </button>
-      </div>
+      {!isOpen && (
+        <div className="fixed top-4 right-4 z-50">
+          <button
+            className="p-2 rounded-full bg-white shadow-md hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onClick={() => setIsOpen(true)}
+            aria-label="Settings"
+          >
+            <img
+              src={settings}
+              alt="Settings"
+              className="w-6 h-6 text-gray-700"
+            />
+          </button>
+        </div>
+      )}
       <Modal
         open={isOpen}
         setOpen={setIsOpen}
-        className ="max-w-md w-full p-6 rounded-lg"
+        className="max-w-md w-full p-6 rounded-lg"
       >
         <div className="space-y-4">
           <h2 className="text-center text-2xl font-bold text-gray-800 mb-6">
@@ -171,6 +173,12 @@ function Login() {
               </option>
               <option value="qr" className="py-2">
                 Qaraqalpaq
+              </option>
+              <option value="xt" className="py-2">
+                Xitoy
+              </option>
+              <option value="ge" className="py-2">
+                Germany
               </option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">

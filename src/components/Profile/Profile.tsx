@@ -202,17 +202,19 @@ function Profile() {
                 </div>
               </div>
               <div className="mt-[-109px] right-4 z-50">
-                <button
-                  className="p-2 rounded-full bg-white shadow-md hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onClick={() => setIsOpen(true)}
-                  aria-label="Settings"
-                >
-                  <img
-                    src={settings}
-                    alt="Settings"
-                    className="w-6 h-6 text-gray-700"
-                  />
-                </button>
+                {!isOpen && (
+                  <button
+                    className="p-2 rounded-full bg-white shadow-md hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onClick={() => setIsOpen(true)}
+                    aria-label="Settings"
+                  >
+                    <img
+                      src={settings}
+                      alt="Settings"
+                      className="w-6 h-6 text-gray-700"
+                    />
+                  </button>
+                )}
               </div>
             </div>
             {preview && (
@@ -304,6 +306,12 @@ function Profile() {
               </option>
               <option value="qr" className="py-2">
                 Qaraqalpaq
+              </option>
+              <option value="xt" className="py-2">
+                Xitoy
+              </option>
+              <option value="ge" className="py-2">
+                Germany
               </option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">

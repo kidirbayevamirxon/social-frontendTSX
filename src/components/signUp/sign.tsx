@@ -3,7 +3,7 @@ import { usePostRequest } from "../Request/UsePostRequest";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "@radix-ui/react-label";
-import {Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { LoaderCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import Modal from "../Modal/Modal";
@@ -81,7 +81,10 @@ function Sign() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="first-name" className="block text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="first-name"
+                className="block text-sm font-medium text-gray-700"
+              >
                 {t("first_name")}
               </Label>
               <Input
@@ -95,7 +98,10 @@ function Sign() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="last-name" className="block text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="last-name"
+                className="block text-sm font-medium text-gray-700"
+              >
                 {t("last_name")}
               </Label>
               <Input
@@ -110,7 +116,10 @@ function Sign() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="username" className="block text-sm font-medium text-gray-700">
+            <Label
+              htmlFor="username"
+              className="block text-sm font-medium text-gray-700"
+            >
               {t("username")}
             </Label>
             <Input
@@ -124,7 +133,10 @@ function Sign() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <Label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
               {t("email")}
             </Label>
             <Input
@@ -139,7 +151,10 @@ function Sign() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <Label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
               {t("password")}
             </Label>
             <Input
@@ -170,29 +185,34 @@ function Sign() {
 
           <div className="text-center text-sm text-gray-600 mt-4">
             {t("already_registered")}{" "}
-            <Link to="/" className="text-indigo-600 hover:text-indigo-800 font-medium hover:underline">
-             {t("loginn")}
+            <Link
+              to="/"
+              className="text-indigo-600 hover:text-indigo-800 font-medium hover:underline"
+            >
+              {t("loginn")}
             </Link>
           </div>
         </form>
       </div>
-      <div className="fixed top-4 right-4 z-50">
-        <button
-          className="p-2 rounded-full bg-white shadow-md hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          onClick={() => setIsOpen(true)}
-          aria-label="Settings"
-        >
-          <img
-            src={settings}
-            alt="Settings"
-            className="w-6 h-6 text-gray-700"
-          />
-        </button>
-      </div>
+      {!isOpen && (
+        <div className="fixed top-4 right-4 z-50">
+          <button
+            className="p-2 rounded-full bg-white shadow-md hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onClick={() => setIsOpen(true)}
+            aria-label="Settings"
+          >
+            <img
+              src={settings}
+              alt="Settings"
+              className="w-6 h-6 text-gray-700"
+            />
+          </button>
+        </div>
+      )}
       <Modal
         open={isOpen}
         setOpen={setIsOpen}
-        className ="max-w-md w-full p-6 rounded-lg"
+        className="max-w-md w-full p-6 rounded-lg"
       >
         <div className="space-y-4">
           <h2 className="text-center text-2xl font-bold text-gray-800 mb-6">
@@ -216,6 +236,12 @@ function Sign() {
               </option>
               <option value="qr" className="py-2">
                 Qaraqalpaq
+              </option>
+              <option value="xt" className="py-2">
+                Xitoy
+              </option>
+              <option value="ge" className="py-2">
+                Germany
               </option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
