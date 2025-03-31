@@ -6,8 +6,10 @@ import { useState } from "react";
 import axios from "axios";
 import { Loader2, ImagePlus } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 function Post() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -80,23 +82,23 @@ function Post() {
     <div className="flex-1 overflow-y-auto bg-gray-100 p-4 md:p-8">
       <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-200">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 text-center">
-          Create New Post
+         {t("titleCr")}
         </h1>
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
             <label className="block text-gray-700 font-medium mb-2 text-lg">
-              What's on your mind?
+              {t("whats_on_your_mind")}
             </label>
             <Input
               className="w-full text-lg bg-white border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-              placeholder="Share your thoughts..."
+              placeholder={t("share_thoughts")}
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
             />
           </div>
           <div>
             <label className="block text-gray-700 font-medium mb-2 text-lg">
-              Add an image
+              {t("add_image")}
             </label>
             <Label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-xl p-6 cursor-pointer hover:bg-gray-50 transition">
               {preview ? (
@@ -113,10 +115,10 @@ function Post() {
                     <ImagePlus className="w-8 h-8 text-indigo-600" />
                   </div>
                   <span className="text-gray-600 font-medium">
-                    Click to upload image
+                    {t("click_to_upload")}
                   </span>
                   <span className="text-gray-400 text-sm mt-1">
-                    JPG, PNG up to 5MB
+                    {t("file_info")}
                   </span>
                 </div>
               )}
@@ -136,10 +138,10 @@ function Post() {
             {loading ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                Posting...
+                {t("posting")}
               </>
             ) : (
-              "Create Post"
+              `${t("create_button")}`
             )}
           </Button>
         </form>

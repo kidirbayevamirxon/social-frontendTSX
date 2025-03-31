@@ -6,6 +6,7 @@ interface ModalProps {
   open: boolean;
   setOpen: (open: boolean) => void;
   children: ReactNode; 
+  className?: string;
 }
 
 export default function Modal({ open, setOpen, children }: ModalProps) {

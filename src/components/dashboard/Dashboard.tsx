@@ -6,8 +6,10 @@ import search from "/magnifying-glass-solid.svg";
 import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getLocalStorageImage } from "@/utils/storageUtils";
+import { useTranslation } from "react-i18next";
 
 function Dashboard() {
+  const { t } = useTranslation();
   const location = useLocation();
   const [userImage, setUserImage] = useState<string>(profile);
   useEffect(() => {
@@ -26,16 +28,18 @@ function Dashboard() {
     return location.pathname.toLowerCase().includes(path.toLowerCase());
   };
   const navItems = [
-    { path: "home", icon: home, label: "Home" },
-    { path: "search", icon: search, label: "Search" },
-    { path: "post", icon: plus, label: "Create" },
+    { path: "home", icon: home, label: `${t("home")}` },
+    { path: "search", icon: search, label: `${t("search")}` },
+    { path: "post", icon: plus, label: `${t("create")}` },
   ];
 
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="w-20 md:w-64 h-full bg-indigo-900 text-center p-4 md:p-6 flex flex-col transition-all duration-300">
         <div className="mb-10 md:mb-16">
-          <h2 className="hidden md:block text-white text-2xl md:text-4xl font-bold">SocialApp</h2>
+          <h2 className="hidden md:block text-white text-2xl md:text-4xl font-bold">
+            SocialApp
+          </h2>
           <div className="md:hidden flex justify-center">
             <span className="text-white text-2xl font-bold">S</span>
           </div>
@@ -48,8 +52,8 @@ function Dashboard() {
                 key={item.path}
                 to={item.path}
                 className={`flex items-center justify-center md:justify-start gap-3 p-3 rounded-lg transition-colors ${
-                  isActive(item.path) 
-                    ? "bg-indigo-700 shadow-md" 
+                  isActive(item.path)
+                    ? "bg-indigo-700 shadow-md"
                     : "hover:bg-indigo-800"
                 }`}
               >
@@ -60,9 +64,9 @@ function Dashboard() {
                     isActive(item.path) ? "text-white" : "text-gray-300"
                   }`}
                   style={{
-                    filter: isActive(item.path) 
-                      ? "brightness(0) invert(1)" 
-                      : "brightness(0) invert(0.8)"
+                    filter: isActive(item.path)
+                      ? "brightness(0) invert(1)"
+                      : "brightness(0) invert(0.8)",
                   }}
                 />
                 <span className="hidden md:block text-white text-lg md:text-xl">
@@ -74,8 +78,8 @@ function Dashboard() {
           <Link
             to="profile"
             className={`flex items-center justify-center md:justify-start gap-3 p-3 rounded-lg transition-colors ${
-              isActive("profile") 
-                ? "bg-indigo-700 shadow-md" 
+              isActive("profile")
+                ? "bg-indigo-700 shadow-md"
                 : "hover:bg-indigo-800"
             }`}
           >
@@ -93,7 +97,7 @@ function Dashboard() {
               )}
             </div>
             <span className="hidden md:block text-white text-lg md:text-xl">
-              Profile
+              {t("profile")}
             </span>
           </Link>
         </div>

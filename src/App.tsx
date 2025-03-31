@@ -10,6 +10,7 @@ import Home from "./components/Home/Home.tsx";
 import NotFound from "./components/Error/Error.tsx";
 import UserProfile from "./components/UserProfile/UserProfile.tsx";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import "./i18n.ts"
 
 function App() {
   return (

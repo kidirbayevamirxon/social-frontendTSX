@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Zap } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 function NotFound() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -14,11 +16,9 @@ function NotFound() {
           <div className="mb-8">
             <div className="text-9xl font-bold text-indigo-600 mb-4">404</div>
             <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-              Page Not Found
+              {t("titleEr")}
             </h1>
-            <p className="text-lg text-gray-600 mb-8">
-              Oops! The page you're looking for doesn't exist or has been moved.
-            </p>
+            <p className="text-lg text-gray-600 mb-8">{t("message")}</p>
           </div>
 
           <div className="space-y-4">
@@ -27,7 +27,7 @@ function NotFound() {
               className="w-full py-6 text-lg bg-indigo-600 hover:bg-indigo-700"
               onClick={() => navigate(-1)}
             >
-              Go Back
+              {t("go_back")}
             </Button>
             <Button
               size="lg"
@@ -36,12 +36,12 @@ function NotFound() {
               onClick={() => navigate("/dashboard/home")}
             >
               <Zap className="mr-2 h-5 w-5" />
-              Return to Home
+              {t("return_home")}
             </Button>
           </div>
 
           <div className="mt-12 text-gray-400 text-sm">
-            <p>Need help? Contact our support team</p>
+            <p>{t("need_help")}</p>
           </div>
         </div>
       </div>

@@ -7,6 +7,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import defaultUser from "/user-solid (1).svg";
 import { Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface UserSearchResult {
   username: string;
@@ -18,6 +19,7 @@ interface UserSearchResult {
 
 function Search() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<UserSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -120,10 +122,10 @@ function Search() {
       <div className="max-w-2xl mx-auto">
         <div className="mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-            Search Users
+            {t("titleSer")}
           </h1>
           <p className="text-gray-500 mt-2">
-            Find and connect with other users
+            {t("description")}
           </p>
         </div>
         <div className="flex items-center gap-3 mb-8">
@@ -138,7 +140,7 @@ function Search() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder="Enter username..."
+              placeholder={t("enter_username_pl")}
             />
           </div>
           <Button
@@ -146,7 +148,7 @@ function Search() {
             onClick={handleSearch}
             disabled={isLoading}
           >
-            Search
+            {t("search")}
           </Button>
         </div>
         {isLoading && (
@@ -190,7 +192,7 @@ function Search() {
                         </p>
                       )}
                       <p className="text-sm text-gray-500">
-                        {user.has_followed ? "Following" : "Not following"}
+                        {user.has_followed ? `${t("following")}` : `${t("not_following")}`}
                       </p>
                     </div>
                   </Link>
@@ -206,9 +208,9 @@ function Search() {
                     {isFollowing[user.username] ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : user.has_followed ? (
-                      "Unfollow"
+                      `${("unfollow")}`
                     ) : (
-                      "Follow"
+                      `${("follow")}`
                     )}
                   </Button>
                 </div>
@@ -233,10 +235,10 @@ function Search() {
               />
             </svg>
             <h3 className="mt-4 text-lg font-medium text-gray-700">
-              No users found
+              {t("no_users_found")}
             </h3>
             <p className="mt-1 text-gray-500">
-              Try searching for a different username
+              {t("try_different")}
             </p>
           </div>
         )}
@@ -257,10 +259,10 @@ function Search() {
               />
             </svg>
             <h3 className="mt-4 text-lg font-medium text-gray-700">
-              Search for users
+              {t("search_placeholder")}
             </h3>
             <p className="mt-1 text-gray-500">
-              Enter a username to find people
+              {t("enter_usernameSer")}
             </p>
           </div>
         )}

@@ -6,6 +6,10 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Loader2, Mail, Users, UserPlus } from "lucide-react";
 import { toast } from "react-hot-toast";
+import Modal from "../Modal/Modal";
+import settings from "/gear-solid.svg";
+import { useTranslation } from "react-i18next";
+
 import {
   getLocalStorageImage,
   setLocalStorageImage,
@@ -14,7 +18,9 @@ import {
 
 function Profile() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [userData, setUserData] = useState(() => {
     const initialImg = getLocalStorageImage();
     return {
@@ -30,7 +36,9 @@ function Profile() {
 
   const [preview, setPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
+  const changeLanguage = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    i18n.changeLanguage(event.target.value);
+  };
   const getSafeImageUrl = (imgUrl: string | null): string => {
     if (preview) return preview;
     if (!imgUrl) return user;
@@ -112,7 +120,7 @@ function Profile() {
           ? response.data[0]
           : response.data;
         if (data) {
-          const storedImg = getLocalStorageImage(); 
+          const storedImg = getLocalStorageImage();
           const imgUrl =
             data.user_img && isValidHttpUrl(data.user_img)
               ? data.user_img
@@ -166,7 +174,7 @@ function Profile() {
                     className="hidden"
                     onChange={handleFileChange}
                   />
-                  <span className="text-white text-sm">Change</span>
+                  <span className="text-white text-sm">{t("change")}</span>
                 </label>
               </div>
               <div className="flex-1 text-center md:text-left">
@@ -181,20 +189,37 @@ function Profile() {
                 <div className="flex gap-6 mt-4 justify-center md:justify-start">
                   <div className="flex items-center text-gray-700">
                     <Users className="w-5 h-5 mr-2" />
-                    <span>{userData.followers} Followers</span>
+                    <span>
+                      {userData.followers} {t("followers")}
+                    </span>
                   </div>
                   <div className="flex items-center text-gray-700">
                     <UserPlus className="w-5 h-5 mr-2" />
-                    <span>{userData.followings} Following</span>
+                    <span>
+                      {userData.followings} {t("followingPr")}
+                    </span>
                   </div>
                 </div>
+              </div>
+              <div className="mt-[-109px] right-4 z-50">
+                <button
+                  className="p-2 rounded-full bg-white shadow-md hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onClick={() => setIsOpen(true)}
+                  aria-label="Settings"
+                >
+                  <img
+                    src={settings}
+                    alt="Settings"
+                    className="w-6 h-6 text-gray-700"
+                  />
+                </button>
               </div>
             </div>
             {preview && (
               <div className="mt-6 flex flex-col items-center gap-4">
                 <div className="flex gap-4">
                   <Button variant="outline" onClick={() => setPreview(null)}>
-                    Cancel
+                    {t("cancel")}
                   </Button>
                   <Button
                     onClick={handleImageUpload}
@@ -204,7 +229,7 @@ function Profile() {
                     {loading ? (
                       <Loader2 className="w-4 h-4 animate-spin mr-2" />
                     ) : null}
-                    Save Changes
+                    {t("save_changes")}
                   </Button>
                 </div>
               </div>
@@ -213,12 +238,12 @@ function Profile() {
         </div>
         <div className="bg-white rounded-xl shadow-md p-8">
           <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-            Profile Information
+            {t("profile_info")}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <h3 className="text-lg font-medium text-gray-700 mb-2">
-                First Name
+                {t("first_name")}
               </h3>
               <p className="text-gray-900 p-3 bg-gray-50 rounded-lg">
                 {userData.first_name}
@@ -227,7 +252,7 @@ function Profile() {
 
             <div>
               <h3 className="text-lg font-medium text-gray-700 mb-2">
-                Last Name
+                {t("last_name")}
               </h3>
               <p className="text-gray-900 p-3 bg-gray-50 rounded-lg">
                 {userData.last_name}
@@ -235,14 +260,16 @@ function Profile() {
             </div>
             <div>
               <h3 className="text-lg font-medium text-gray-700 mb-2">
-                Username
+                {t("username")}
               </h3>
               <p className="text-gray-900 p-3 bg-gray-50 rounded-lg">
                 @{userData.username}
               </p>
             </div>
             <div>
-              <h3 className="text-lg font-medium text-gray-700 mb-2">Email</h3>
+              <h3 className="text-lg font-medium text-gray-700 mb-2">
+                {t("email")}
+              </h3>
               <p className="text-gray-900 p-3 bg-gray-50 rounded-lg">
                 {userData.email}
               </p>
@@ -250,6 +277,56 @@ function Profile() {
           </div>
         </div>
       </div>
+      <Modal
+        open={isOpen}
+        setOpen={setIsOpen}
+        className="max-w-md w-full p-6 rounded-lg"
+      >
+        <div className="space-y-4">
+          <h2 className="text-center text-2xl font-bold text-gray-800 mb-6">
+            {t("select_language")}
+          </h2>
+
+          <div className="relative">
+            <select
+              onChange={changeLanguage}
+              value={i18n.language}
+              className="block w-full px-4 py-3 pr-8 text-base border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white"
+            >
+              <option value="uz" className="py-2">
+                O'zbekcha
+              </option>
+              <option value="en" className="py-2">
+                English
+              </option>
+              <option value="ru" className="py-2">
+                Русский
+              </option>
+              <option value="qr" className="py-2">
+                Qaraqalpaq
+              </option>
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-4">
+            <button
+              onClick={() => setIsOpen(false)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+            >
+              {t("close")}
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

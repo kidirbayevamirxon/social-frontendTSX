@@ -5,6 +5,7 @@ import { toast } from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 import defaultUser from "/user-solid.svg";
 import { Button } from "../ui/button";
+import { useTranslation } from "react-i18next";
 
 interface UserProfile {
   first_name: string;
@@ -18,6 +19,7 @@ interface UserProfile {
 }
 
 function UserProfile() {
+  const { t } = useTranslation();
   const { username } = useParams<{ username: string }>();
   const navigate = useNavigate();
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -43,7 +45,7 @@ function UserProfile() {
         console.log(`Foydalanuvchi profili yuklanmoqda: ${username}`);
 
         const response = await axios.get(
-          `https://social-backend-kzy5.onrender.com/auth/user`, 
+          `https://social-backend-kzy5.onrender.com/auth/user`,
           {
             params: { username },
             headers: {
@@ -57,7 +59,7 @@ function UserProfile() {
           return;
         }
 
-        const userData = response.data[0]; 
+        const userData = response.data[0];
         setUser(userData);
         setIsFollowing(userData.has_followed);
         setFollowersCount(userData.followers || 0);
@@ -128,7 +130,7 @@ function UserProfile() {
   if (!user) {
     return (
       <div className="flex justify-center items-center h-[80vh]">
-        <p className="text-gray-600">Foydalanuvchi topilmadi</p>
+        <p className="text-gray-600">{t("user_not_found")}</p>
       </div>
     );
   }
@@ -157,7 +159,7 @@ function UserProfile() {
               className="w-full md:w-auto px-6 m-auto"
               onClick={handleFollow}
             >
-              {isFollowing ? "Followed" : "Follow"}
+              {isFollowing ? `${t("unfollow")}` : `${t("follow")}`}
             </Button>
           </div>
 
@@ -172,19 +174,21 @@ function UserProfile() {
             <div className="flex space-x-6 mb-6">
               <div className="text-center">
                 <p className="font-bold text-gray-800">0</p>
-                <p className="text-gray-500 text-sm">Postlar</p>
+                <p className="text-gray-500 text-sm">{t("posts")}</p>
               </div>
               <div className="text-center">
                 <p className="font-bold text-gray-800">{followersCount}</p>
-                <p className="text-gray-500 text-sm">Kuzatuvchilar</p>
+                <p className="text-gray-500 text-sm">{t("followersUs")}</p>
               </div>
               <div className="text-center">
                 <p className="font-bold text-gray-800">{user.following || 0}</p>
-                <p className="text-gray-500 text-sm">Kuzatilganlar</p>
+                <p className="text-gray-500 text-sm">{t("followingUs")}</p>
               </div>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-800 mb-2">Aloqa</h3>
+              <h3 className="font-semibold text-gray-800 mb-2">
+                {t("contact")}
+              </h3>
               <p className="text-gray-600">{user.email}</p>
             </div>
           </div>
