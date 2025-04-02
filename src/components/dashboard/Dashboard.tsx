@@ -3,6 +3,7 @@ import home from "/house-solid.svg";
 import profile from "/user-solid.svg";
 import plus from "/circle-plus-solid.svg";
 import search from "/magnifying-glass-solid.svg";
+// import message from "/facebook-messenger-brands.svg"
 import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getLocalStorageImage } from "@/utils/storageUtils";
@@ -31,6 +32,7 @@ function Dashboard() {
     { path: "home", icon: home, label: `${t("home")}` },
     { path: "search", icon: search, label: `${t("search")}` },
     { path: "post", icon: plus, label: `${t("create")}` },
+    // {path:"message", icon:message, label:`${t("message")}`}
   ];
 
   return (

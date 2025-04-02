@@ -8,6 +8,7 @@ import Post from "./components/Post/Post.tsx";
 import Search from "./components/Search/Search.tsx";
 import Home from "./components/Home/Home.tsx";
 import NotFound from "./components/Error/Error.tsx";
+// import Message from "./components/message/Message.tsx"
 import UserProfile from "./components/UserProfile/UserProfile.tsx";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./i18n.ts"
@@ -26,6 +27,7 @@ function App() {
             <Route path="profile/:username" element={<UserProfile />} /> 
             <Route path="post" element={<Post />} />
             <Route path="search" element={<Search />} />
+            {/* <Route path="message" element={<Message />} /> */}
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
