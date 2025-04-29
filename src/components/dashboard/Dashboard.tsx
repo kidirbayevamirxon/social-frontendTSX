@@ -3,7 +3,7 @@ import home from "/house-solid.svg";
 import profile from "/user-solid.svg";
 import plus from "/circle-plus-solid.svg";
 import search from "/magnifying-glass-solid.svg";
-import message from "/facebook-messenger-brands.svg"
+// import message from "/facebook-messenger-brands.svg"
 import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getLocalStorageImage } from "@/utils/storageUtils";
